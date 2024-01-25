@@ -25,10 +25,12 @@ app.use(cookieParser())
 // import productRoutes from './routes/productRoute.js'
 const productRoutes = require('./routes/productRoute')
 const authRoutes = require('./routes/authRoute')
+const orderRoutes = require('./routes/orderRoute')
 
 
 app.use('/api/v1', productRoutes)
 app.use('/api/v1', authRoutes)
+app.use('/api/v1', orderRoutes)
 
 //using error middleware
 app.use(errorMiddleware);

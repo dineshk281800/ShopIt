@@ -17,4 +17,11 @@ router.route('/products/:id')
 router.route('/admin/products/:id')
     .patch(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.updateProduct)
     .delete(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.deleteProduct)
+
+router.route('/reviews')
+    .get(authMiddleware.isAuthenticatedUser, productController.getProductReviews)
+    .patch(authMiddleware.isAuthenticatedUser, productController.createProductReview)
+
+router.route('/admin/reviews')
+    .delete(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.deleteReview)
 module.exports = router;

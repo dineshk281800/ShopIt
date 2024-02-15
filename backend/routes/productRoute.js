@@ -10,18 +10,28 @@ router.route('/products')
 
 router.route('/admin/products')
     .post(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.newProducts)
+    .get(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.getAdminProducts)
 
 router.route('/products/:id')
     .get(productController.getProductDetails)
 
+
 router.route('/admin/products/:id')
-    .patch(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.updateProduct)
+    .put(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.updateProduct)
     .delete(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.deleteProduct)
+
+router.route('/admin/products/:id/upload_images')
+    .put(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.uploadProductImages)
+
+router.route('/admin/products/:id/delete_image')
+    .put(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.deleteProductImage)
 
 router.route('/reviews')
     .get(authMiddleware.isAuthenticatedUser, productController.getProductReviews)
-    .patch(authMiddleware.isAuthenticatedUser, productController.createProductReview)
+    .put(authMiddleware.isAuthenticatedUser, productController.createProductReview)
 
+router.route('/can_review')
+    .get(authMiddleware.isAuthenticatedUser, productController.canUserReview)
 router.route('/admin/reviews')
     .delete(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), productController.deleteReview)
 module.exports = router;

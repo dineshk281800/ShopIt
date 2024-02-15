@@ -3,15 +3,15 @@ const ProductModel = require('../models/productModel');
 const OrderModel = require('../models/orderModel');
 const APIFilters = require('../utils/apiFilters');
 const ErrorHandler = require('../utils/errorHandler')
-
-exports.getProducts = catchAsyncError(async (req, res) => {
+const { delete_file, upload_file } = require("../utils/cloudinary")
+// Create new product => /api/v1/products
+exports.getProducts = catchAsyncError(async (req, res, next) => {
     const resPerPage = 4
     const apiFilters = new APIFilters(ProductModel, req.query).search().filter();
 
     // console.log("req.user", req.user)
     let products = await apiFilters.query;
     let filteredProductsCount = products.length;
-
 
     apiFilters.pagination(resPerPage)
     products = await apiFilters.query.clone();
@@ -37,7 +37,7 @@ exports.newProducts = catchAsyncError(async (req, res) => {
 
 // Get single product details-  /api/v1/products/:id
 exports.getProductDetails = catchAsyncError(async (req, res, next) => {
-    const product = await ProductModel.findById(req.params.id)
+    const product = await ProductModel.findById(req.params.id).populate('reviews.user')
 
     if (!product) {
         return next(new ErrorHandler("Product not found"), 404)
@@ -48,6 +48,15 @@ exports.getProductDetails = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json({
         product
+    })
+})
+
+// Get product - Admin => /api/v1/admin/products
+exports.getAdminProducts = catchAsyncError(async (req, res, next) => {
+    const products = await ProductModel.find()
+
+    res.status(200).json({
+        products
     })
 })
 
@@ -62,6 +71,48 @@ exports.updateProduct = catchAsyncError(async (req, res) => {
     }
 
     product = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
+
+    res.status(200).json({
+        product
+    })
+})
+
+// upload product images => /api/v1/admin/products/:id/upload_images
+exports.uploadProductImages = catchAsyncError(async (req, res, next) => {
+    const product = await ProductModel.findById(req.params.id)
+
+    if (!product) {
+        return next(new ErrorHandler("Product not found"), 404)
+    }
+
+    const uploader = async (image) => upload_file(image, "shopit/products");
+
+    const urls = await Promise.all((req?.body?.images).map(uploader));
+
+    product?.images?.push(...urls);
+    await product?.save();
+
+    res.status(200).json({
+        product
+    })
+})
+
+// Delete product => /api/v1/products/:id/delete_image
+exports.deleteProductImage = catchAsyncError(async (req, res, next) => {
+    const product = await ProductModel.findById(req.params.id)
+
+    if (!product) {
+        return next(new ErrorHandler("Product not found"), 404)
+    }
+
+    const isDeleted = await delete_file(req.body.imgId);
+
+    if (isDeleted) {
+        product.images = product?.images?.filter(
+            (img) => img.public_id !== req.body.imgId
+        );
+        await product?.save();
+    }
 
     res.status(200).json({
         product
@@ -103,8 +154,8 @@ exports.createProductReview = catchAsyncError(async (req, res, next) => {
     const isReviewed = product.reviews.find(
         (review) => review.user.toString() === req.user._id.toString()
     )
-    console.log("product.reviews:", product.reviews)
-    console.log("isReviewed:", isReviewed)
+    // console.log("product.reviews:", product.reviews)
+    // console.log("isReviewed:", isReviewed)
 
     if (isReviewed) {
         product.reviews.forEach((review) => {

@@ -1,11 +1,24 @@
 // import express from 'express';
 // import dotenv from 'dotenv';
+// import cors from 'cors';
+// import cookieParser from 'cookie-parser';
+// import database from './config/dbConnect';
+// import errorMiddleware from './middlewares/error';
 const express = require('express');
-const dotenv = require('dotenv');
 const app = express();
+const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser')
-const database = require('./config/dbConnect')
-const errorMiddleware = require('./middlewares/error')
+const cors = require("cors");
+const database = require('./config/dbConnect.js')
+const errorMiddleware = require('./middlewares/error.js')
+
+const path = require("path");
+// const { fileURLToPath } = require('url')
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// const __dirname = fileURLToPath(path.dirname(import.meta.ur))
 // handle uncaught Exception
 process.on("uncaughtException", (err) => {
     console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
@@ -13,12 +26,24 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 });
 
-dotenv.config({ path: 'backend/config/config.env' })
+if (process.env.NODE_ENV !== "PRODUCTION") {
+    dotenv.config({ path: 'backend/config/config.env' })
+}
 
 // connection to database
 database.db();
 
-app.use(express.json());
+app.use(express.json({
+    limit: "10mb",
+    verify: (req, res, buf) => {
+        req.rawBody = buf.toString();
+    },
+}));
+// app.use(cors({
+//     credentials: true,
+//     origin: true,
+// }));
+app.use(cors())
 app.use(cookieParser())
 
 // import all routes
@@ -26,12 +51,21 @@ app.use(cookieParser())
 const productRoutes = require('./routes/productRoute')
 const authRoutes = require('./routes/authRoute')
 const orderRoutes = require('./routes/orderRoute')
-
+const paymentRoutes = require('./routes/paymentRoute')
+const { fileURLToPath } = require('url')
 
 app.use('/api/v1', productRoutes)
 app.use('/api/v1', authRoutes)
 app.use('/api/v1', orderRoutes)
+app.use('/api/v1', paymentRoutes)
 
+if (process.env.NODE_ENV === "PRODUCTION") {
+    app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "../frontend/build/index.html"))
+    })
+}
 //using error middleware
 app.use(errorMiddleware);
 

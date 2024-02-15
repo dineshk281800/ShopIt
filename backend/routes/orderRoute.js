@@ -12,10 +12,13 @@ router.route('/orders/:id')
 router.route('/me/orders')
     .get(authMiddleware.isAuthenticatedUser, orderController.myOrders)
 
+router.route('/admin/get_sales')
+    .get(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), orderController.getSales)
+
 router.route('/admin/orders')
     .get(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), orderController.allOrders)
 
 router.route('/admin/orders/:id')
-    .patch(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), orderController.updateOrder)
+    .put(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), orderController.updateOrder)
     .delete(authMiddleware.isAuthenticatedUser, authMiddleware.authorizeRoles("admin"), orderController.deleteOrder)
 module.exports = router;

@@ -5,6 +5,9 @@ const sendToken = require('../utils/sendToken');
 const emailTemplate = require('../utils/emailTemplates')
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
+const { delete_file, upload_file } = require('../utils/cloudinary')
+// import { delete_file, upload_file } from "../utils/cloudinary.js";
+
 // Register User - /api/v1/register
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     const { name, email, password } = req.body;
@@ -65,6 +68,24 @@ exports.logoutUser = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
+// upload user avatar = /api/v1/upload_avatar
+exports.uploadAvatar = catchAsyncErrors(async (req, res, next) => {
+    const avatarResponse = await upload_file(req.body.avatar, "shopit/avatars");
+
+    // Remove previous avatar
+    if (req?.user?.avatar?.url) {
+        await delete_file(req?.user?.avatar?.public_id);
+    }
+
+    const user = await UserModel.findByIdAndUpdate(req?.user?._id, {
+        avatar: avatarResponse,
+    });
+
+    res.status(200).json({
+        user,
+    });
+});
+
 // Forget password - /api/v1/password/forgot
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
@@ -81,7 +102,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
     await user.save()
 
     // create reset password url 
-    const resetUrl = `${process.env.FRONTEND_URL}/api/v1/password/reset/${resetToken}`
+    const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`
 
     const message = emailTemplate.getResetPasswordTemplate(user.name, resetUrl)
 
@@ -144,7 +165,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-// Get current user profile - /api/v1/user
+// Get current user profile - /api/v1/me
 exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
     const user = await UserModel.findById(req.user._id);
 
@@ -239,7 +260,10 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler(`User not found with id: ${req.params.id}`, 404))
     }
 
-    // TODO - Remove user Avatar from cloudinary
+    //Remove user Avatar from cloudinary
+    if (user?.avatar?.public_id) {
+        await delete_file(user?.avatar?.public_id);
+    }
 
     await user.deleteOne();
 

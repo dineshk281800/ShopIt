@@ -1,0 +1,7 @@
+D:\Dinesh\shop_It> cd .\stripe_1.19.2_windows_x86_64\
+
+D:\Dinesh\shop_It\stripe_1.19.2_windows_x86_64>
+
+1.)stripe login
+
+2.)stripe listen --events checkout.session.completed --forward-to localhost:8000/api/v1/payment/webhook

@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setCartItem } from "../../redux/features/cartSlice"
 import NewReview from '../reviews/NewReview'
 import ListReviews from '../reviews/ListReviews'
+import NotFound from '../layout/NotFound'
 
 const ProductDetails = () => {
     const params = useParams();
@@ -66,8 +67,14 @@ const ProductDetails = () => {
     }
 
 
+
     // setActiveImage(product.images[0] ? product.images[0].url : "./images//default_product.png")
     if (isLoading) return <Loader />
+
+    if (error && error?.status == 404) {
+        return <NotFound />
+    }
+
     return (
         <>
             <MetaData title={product?.name} />

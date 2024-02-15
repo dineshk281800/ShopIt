@@ -11,6 +11,7 @@ import { setCartItem } from "../../redux/features/cartSlice"
 import MetaData from '../layout/MetaData'
 import NewReview from '../reviews/NewReview'
 import ListReviews from '../reviews/ListReviews'
+import NotFound from '../layout/NotFound'
 
 
 const ProductDetails = () => {
@@ -88,7 +89,7 @@ const ProductDetails = () => {
     }
 
     if (load) return <Loader />
-    // if (!productData) return <Loader />
+
     return (
         <>
             <MetaData title={productData?.name} />

@@ -12,7 +12,7 @@ const cookieParser = require('cookie-parser')
 const database = require('./config/dbConnect.js')
 const errorMiddleware = require('./middlewares/error.js')
 
-// const path = require("path");
+const path = require("path");
 // const { fileURLToPath } = require('url')
 
 // const __filename = fileURLToPath(import.meta.url);
@@ -26,9 +26,9 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 });
 
-dotenv.config({ path: 'backend/config/config.env' })
-// if (process.env.NODE_ENV !== "PRODUCTION") {
-// }
+if (process.env.NODE_ENV !== "PRODUCTION") {
+    dotenv.config({ path: 'backend/config/config.env' })
+}
 
 // connection to database
 database.db();
@@ -59,19 +59,20 @@ app.use('/api/v1', authRoutes)
 app.use('/api/v1', orderRoutes)
 app.use('/api/v1', paymentRoutes)
 
-// if (process.env.NODE_ENV === "PRODUCTION") {
-//     app.use(express.static(path.join(__dirname, "../frontend/build")));
+if (process.env.NODE_ENV === "PRODUCTION") {
+    app.use(express.static(path.join(__dirname, "../frontend/build")));
 
-//     app.get("*", (req, res) => {
-//         res.sendFile(path.resolve(__dirname, "../frontend/build/index.html"))
-//     })
-// }
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "../frontend/build/index.html"))
+    })
+}
 //using error middleware
 app.use(errorMiddleware);
 
 const server = app.listen(process.env.PORT, () => {
     console.log(`Server started on port: ${process.env.PORT} IN ${process.env.NODE_ENV} mode.`)
 });
+
 
 // handle unhandled Rejection
 // on() is a event loop handler

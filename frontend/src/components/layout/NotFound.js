@@ -4,8 +4,8 @@ const NotFound = () => {
   return (
     <div>
       {" "}
-      <div class="row">
-        <div class="d-flex justify-content-center page-not-found-wrapper">
+      <div className="row">
+        <div className="d-flex justify-content-center page-not-found-wrapper">
           <img
             src="/images/404.svg"
             height="550"
@@ -13,7 +13,7 @@ const NotFound = () => {
             alt="404_not_found"
           />
         </div>
-        <h5 class="text-center">
+        <h5 className="text-center">
           Page Not Found. Go to <a href="/">Homepage</a>
         </h5>
       </div>

@@ -8,15 +8,15 @@ const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser')
-const cors = require("cors");
+// const cors = require("cors");
 const database = require('./config/dbConnect.js')
 const errorMiddleware = require('./middlewares/error.js')
 
-const path = require("path");
+// const path = require("path");
 // const { fileURLToPath } = require('url')
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 // const __dirname = fileURLToPath(path.dirname(import.meta.ur))
 // handle uncaught Exception
@@ -26,9 +26,9 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 });
 
-if (process.env.NODE_ENV !== "PRODUCTION") {
-    dotenv.config({ path: 'backend/config/config.env' })
-}
+dotenv.config({ path: 'backend/config/config.env' })
+// if (process.env.NODE_ENV !== "PRODUCTION") {
+// }
 
 // connection to database
 database.db();
@@ -43,7 +43,7 @@ app.use(express.json({
 //     credentials: true,
 //     origin: true,
 // }));
-app.use(cors())
+// app.use(cors())
 app.use(cookieParser())
 
 // import all routes
@@ -52,20 +52,20 @@ const productRoutes = require('./routes/productRoute')
 const authRoutes = require('./routes/authRoute')
 const orderRoutes = require('./routes/orderRoute')
 const paymentRoutes = require('./routes/paymentRoute')
-const { fileURLToPath } = require('url')
+// const { fileURLToPath } = require('url')
 
 app.use('/api/v1', productRoutes)
 app.use('/api/v1', authRoutes)
 app.use('/api/v1', orderRoutes)
 app.use('/api/v1', paymentRoutes)
 
-if (process.env.NODE_ENV === "PRODUCTION") {
-    app.use(express.static(path.join(__dirname, "../frontend/build")));
+// if (process.env.NODE_ENV === "PRODUCTION") {
+//     app.use(express.static(path.join(__dirname, "../frontend/build")));
 
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "../frontend/build/index.html"))
-    })
-}
+//     app.get("*", (req, res) => {
+//         res.sendFile(path.resolve(__dirname, "../frontend/build/index.html"))
+//     })
+// }
 //using error middleware
 app.use(errorMiddleware);
 

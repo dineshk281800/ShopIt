@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLazyLogoutQuery } from '../../redux/api/authApi';
 
 const Header = () => {
-  const navigate = useNavigate
+  const navigate = useNavigate()
   const { isLoading } = useGetMeQuery();
   // console.log(isLoading)
   // console.log(data)

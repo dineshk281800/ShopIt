@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node backend/app.js",
+    "build": "npm i",
     "dev": "SET NODE_ENV=DEVELOPMENT& nodemon backend/app.js",
     "prod": "SET NODE_ENV=PRODUCTION& nodemon backend/app.js",
     "seeder": "node backend/seeder/seeder.js"
@@ -26,6 +27,6 @@
     "stripe": "^14.15.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.1.0"
   }
 }
